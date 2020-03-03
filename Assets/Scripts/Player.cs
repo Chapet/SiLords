@@ -120,6 +120,7 @@ public class Player : MonoBehaviour
     public void ChangeReadystate()
     {
         readyState = true;
+        readyTest = true;
     }
     public void ChangeTime(int amount)
     {
