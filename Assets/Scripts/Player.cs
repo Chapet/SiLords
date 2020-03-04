@@ -25,12 +25,17 @@ public class Player : MonoBehaviour
 
     //tier
     public int tier = 1;
+    public int upkeep = 0; //nbr d'upgrades d'upkeep
+
+    //reputation
+    public int reputation = 0;
 
     //GameState
     public int time = 1;
     public Seasons season = Seasons.Printemps;
     public bool readyState = false;
     public bool readyTest = false;
+    public int currentEvent = 0;
 
     public void SavePlayer()
     {
@@ -70,48 +75,94 @@ public class Player : MonoBehaviour
 
     public void ChangeWood(int amount)
     {
-        wood += amount;
+        if (wood + amount < 0) wood = 0;
+        else wood += amount;
     }
     public void ChangeStone(int amount)
     {
-        stone += amount;
+        if (stone + amount < 0) wood = 0;
+        else stone += amount;
     }
 
     public void ChangeGrain(int amount)
     {
-        grain += amount;
+        if (grain + amount < 0) wood = 0;
+        else grain += amount;
     }
     public void ChangeIron(int amount)
     {
-        iron += amount;
+        if (iron + amount < 0) wood = 0;
+        else iron += amount;
     }
     public void ChangeGold(int amount)
     {
-        gold += amount;
+        if (gold + amount < 0) wood = 0;
+        else gold += amount;
     }
-    public void AcquirePikemen(int amount)
+    public void ChangeReputation(int amount)
     {
-        pikemen++;
+        if (reputation + amount < 0) reputation = 0;
+        else reputation += amount;
     }
-    public void AcquireMill(int amount)
+    public void AcquireMill()
     {
-        mill = true;
+        if (!mill && HasEnough(500, 2, 3, 0, 0)) //doesn't already own a mill & has the recquired ressources
+        {
+            mill = true;
+            Buy(500, 2, 3, 0, 0);
+        }
+        return;
     }
-    public void AcquireForge(int amount)
+    public void AcquireForge()
     {
-        forge = true;
+        if (!forge && HasEnough(500, 1, 3, 0, 2)) //doesn't already own a forge & has the recquired ressources
+        {
+            forge = true;
+            Buy(500, 1, 3, 0, 2);
+        }
+        return;
     }
-    public void AcquireTavern(int amount)
+    public void AcquireTavern()
     {
-        tavern = true;
+        if (!tavern && HasEnough(500, 3, 1, 1, 0)) //doesn't already own a tavern & has the recquired ressources
+        {
+            tavern = true;
+            Buy(500, 3, 1, 1, 0);
+        }
+        return;
     }
-    public void AcquireCavalry(int amount)
+    public void AcquirePikemen()
     {
-        cavalry++;
+        int upkp = upkeep*20 + tier*50;
+        int curUpkeep = (pikemen + cavalry + archers)*10;
+        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1)) //doesn't already own a tavern & has the recquired ressources
+        {
+            pikemen++;
+            Buy(100, 0, 0, 0, 1);
+        }
+        return;
     }
-    public void AcquireArchers(int amount)
+    public void AcquireCavalry()
     {
-        archers++;
+        int upkp = upkeep * 20 + tier * 50;
+        int curUpkeep = (pikemen + cavalry + archers) * 10;
+        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1)) //doesn't already own a tavern & has the recquired ressources
+        {
+            cavalry++;
+            Buy(100, 0, 0, 0, 1);
+        }
+        return;
+    }
+    public void AcquireArchers()
+    {
+        int upkp = upkeep * 20 + tier * 50;
+        int curUpkeep = (pikemen + cavalry + archers) * 10;
+        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1)) //doesn't already own a tavern & has the recquired ressources
+        {
+            archers++;
+            Buy(100, 0, 0, 0, 1);
+        }
+        return;
     }
     public void ChangeTier(int amount)
     {
@@ -127,5 +178,16 @@ public class Player : MonoBehaviour
         time += amount;
     }
 
+    //checks if the player owns the ressources he needs to buy X
+    private bool HasEnough(int go, int w, int s, int gr, int i) //gold, wood, stone, grain, iron
+    {
+        if (gold < go || wood < w || stone < s || grain < gr || iron < i) return false;
+        else return true;
+    }
+
+    private void Buy(int go, int w, int s, int gr, int i) //gold, wood, stone, grain, iron
+    {
+        gold -= go; wood -= w; stone -= s; grain -= gr; iron -= i;
+    }
     #endregion
 }
