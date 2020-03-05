@@ -21,6 +21,7 @@ public class PopupSystem : MonoBehaviour
 
     public void PopMessage(Popup popup) //rend un panel visible au dessus du reste avec message + options
     {
+        popPanel.SetActive(true);
         switch (popup)
         {
             case Popup.PopBandit:
@@ -30,7 +31,13 @@ public class PopupSystem : MonoBehaviour
                     "saison?\n   Si vous ne les arrêtez pas, il prendront la moitié de votre or ou certaines de vos ressources.";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+
+                if (player.archers + player.cavalry + player.pikemen < 1) //TODO: used units
+                {
+                    player.HasEnough_UI("999999,0,0,0,0,0,0,0,AcceptButton");
+                }
                 break;
+
             case Popup.PopDiscontent:
                 player.currentEvent = 1;
                 textBoxPopupMsg.text = "Votre population est mécontente de la manière dont vous dirigez votre fief, souhaitez-vous " +
@@ -38,7 +45,9 @@ public class PopupSystem : MonoBehaviour
                     "de votre quantité normale d'or pendant le reste de la saison";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+                player.HasEnough_UI("0,0,0,1,0,0,0,0,AcceptButton");
                 break;
+
             case Popup.PopSendKid:
                 player.currentEvent = 2;
                 textBoxPopupMsg.text = "Un de vos enfants a atteint l'âge de 7 ans, il peut être envoyé chez un autre Seigneur " +
@@ -48,13 +57,20 @@ public class PopupSystem : MonoBehaviour
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
                 break;
+
             case Popup.PopMerchant:
                 player.currentEvent = 3;
                 textBoxPopupMsg.text = "Un marchant itinérant est passé par votre fief et vous propose d'acheter la ressouce " +
                     "que vous possédez en plus petite quantité contre 75 pièces d'or.\n   Souhaitez-vous accepter?";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+
+                if (player.wood < 1 && player.stone < 1 && player.grain < 1 && player.iron < 1) // no ressources left
+                {
+                    player.HasEnough_UI("999999,0,0,0,0,0,0,0,AcceptButton");
+                }
                 break;
+
             case Popup.PopHunt:
                 player.currentEvent = 4;
                 textBoxPopupMsg.text = "Vous êtes parti chasser dans une forêt de votre fief et vous avez abbatu un bel animal." +
@@ -62,12 +78,14 @@ public class PopupSystem : MonoBehaviour
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
                 break;
+
             case Popup.PopBountyString:
                 player.currentEvent = 5;
                 textBoxPopupMsg.text = "Le printemps est particulièrement bon pour les récoltes cette année, les stocks se portent " +
                     "bien (+1 grain).";
                 okButton.gameObject.SetActive(true);
                 break;
+
             case Popup.PopFlood:
                 player.currentEvent = 6;
                 textBoxPopupMsg.text = "La pluie s'abbat sans cesse sur le pays: les rivières sortent de leur lit et les lacs " +
@@ -75,13 +93,16 @@ public class PopupSystem : MonoBehaviour
                     "Si un barrage n'est pas construit, vous devrez nourrir vos gens (-2 grain)";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+                player.HasEnough_UI("0,0,1,0,0,0,0,0,AcceptButton");
                 break;
+
             case Popup.PopBountySummer:
                 player.currentEvent = 7;
                 textBoxPopupMsg.text = "L'été est particulièrement bon pour les récoltes cette année, les stocks se portent " +
                     "bien (+1 grain).";
                 okButton.gameObject.SetActive(true);
                 break;
+
             case Popup.PopForestFire:
                 player.currentEvent = 8;
                 textBoxPopupMsg.text = "L'été est torride, la végétation flétrit et il suffirait d'un feu de camp non surveillé " +
@@ -90,13 +111,20 @@ public class PopupSystem : MonoBehaviour
                     "certaines  de vos forêt bruleront sûrement (-2 bois).";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+
+                if (player.archers + player.cavalry + player.pikemen < 1) //TODO: used units
+                {
+                    player.HasEnough_UI("999999,0,0,0,0,0,0,0,AcceptButton");
+                }
                 break;
+
             case Popup.PopBountyFall:
                 player.currentEvent = 9;
                 textBoxPopupMsg.text = "L'automne est particulièrement bon pour les récoltes cette année, les stocks se portent " +
                     "bien (+1 grain).";
                 okButton.gameObject.SetActive(true);
                 break;
+
             case Popup.PopDisease:
                 player.currentEvent = 10;
                 textBoxPopupMsg.text = "L'automne est particulièrement frais et humide, une grippe particulièrement forte circule dans " +
@@ -104,7 +132,9 @@ public class PopupSystem : MonoBehaviour
                     "vous perdrez de la popularité auprès de vos gens (-1 réputation)";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+                player.HasEnough_UI("0,1,0,0,0,0,0,0,AcceptButton");
                 break;
+
             case Popup.PopHarshWinter:
                 player.currentEvent = 11;
                 textBoxPopupMsg.text = "L'hiver est particulièrement rude cette année: le vent souffle, la neige tombe à gros " +
@@ -113,10 +143,9 @@ public class PopupSystem : MonoBehaviour
                     "vous ne pourrez pas construire de bâtiments, recruter des troupes pendant le reste de l'hiver";
                 acceptButton.gameObject.SetActive(true);
                 refuseButton.gameObject.SetActive(true);
+                player.HasEnough_UI("0,1,0,1,0,0,0,0,AcceptButton");
                 break;
         }
-
-        popPanel.SetActive(true);
     }
 
     public void DoOnAccept()
@@ -124,70 +153,40 @@ public class PopupSystem : MonoBehaviour
         switch (player.currentEvent)
         {
             case 0: //Bandits
-                if (true) //TODO: change to boolean "!hasAvailableUnits"
-                {
-                    PopMessage(Popup.PopBandit);
-                }
                 break;
+
             case 1: //Discontent
-                if (player.grain < 1) //0 grain
-                {
-                    PopMessage(Popup.PopDiscontent);
-                }
                 player.ChangeGrain(-1);
                 break;
+
             case 2: //SendKid
                 Debug.Log("TODO: Sending Kid");
                 break;
+
             case 3: //Merchant
-                if (player.wood == 0 && player.stone == 0 && player.grain == 0 && player.iron == 0) // no ressources left
-                {
-                    player.ChangeGold(25);
-                    Debug.Log("TODO: Popup: Le marchand a pitié et donne 25 gold");
-                }
-                else
-                {
-                    player.ChangeGold(75);
-                    Debug.Log("TODO: le marchand prend d'une ressource");
-                }
+                player.ChangeGold(75);
+                Debug.Log("TODO: le marchand prend d'une ressource");
                 break;
+
             case 4: //Hunt
                 player.ChangeReputation(1);
                 break;
+
             case 6: //Flood
-                if (player.stone < 1) //0 stone
-                {
-                    PopMessage(Popup.PopFlood);
-                }
                 player.ChangeStone(-1);
                 break;
+
             case 8: //ForestFire
-                if (true) //TODO: change to boolean "!hasAvailableUnits"
-                {
-                    PopMessage(Popup.PopForestFire);
-                }
-                else 
-                {
-                    Debug.Log("TODO: 1 unit taken");
-                }
+                Debug.Log("TODO: 1 unit taken");
                 break;
+
             case 10: //Disease
-                if (player.wood < 1) //0 wood
-                {
-                    PopMessage(Popup.PopDisease);
-                }
                 player.ChangeWood(-1);
                 break;
+
             case 11: //HarshWinter
-                if (player.wood < 1 || player.grain < 1) //0 wood or 0 grain
-                {
-                    PopMessage(Popup.PopHarshWinter);
-                }
-                else
-                {
-                    player.ChangeWood(-1);
-                    player.ChangeGrain(-1);
-                } 
+                player.ChangeWood(-1);
+                player.ChangeGrain(-1);
                 break;
         }
     }
@@ -200,25 +199,38 @@ public class PopupSystem : MonoBehaviour
                 player.ChangeGold(-player.tier*25);
                 player.ChangeIron(-1);
                 break;
+
             case 1: //Discontent
                 Debug.Log("Rates set to 1/2 for the rest of the season");
                 break;
+
             case 2: //SendKid
                 break;
+
             case 3: //Merchant
-                break;
+                if (player.wood < 1 && player.stone < 1 && player.grain < 1 && player.iron < 1) // no ressources left
+                {
+                    player.ChangeGold(25);
+                    Debug.Log("TODO: Popup: le marchand a pitié et donne 25 pièces d'or");
+                }
+                    break;
+
             case 4: //Hunt
                 player.ChangeGrain(1);
                 break;
+
             case 6: //Flood
                 player.ChangeGrain(-2);
                 break;
+
             case 8: //ForestFire
                 player.ChangeWood(-2);
                 break;
+
             case 10: //Disease
                 player.ChangeReputation(-1);
                 break;
+
             case 11: //HarshWinter
                 Debug.Log("TODO: Cannot buy buildings/troops or attack until the end of winter");
                 break;

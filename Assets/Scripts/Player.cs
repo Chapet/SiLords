@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -164,9 +165,12 @@ public class Player : MonoBehaviour
         }
         return;
     }
-    public void ChangeTier(int amount)
+    public void ChangeTier(int level)
     {
-        tier += amount;
+        if (level == 2)
+        {
+            
+        }
     }
     public void ChangeReadystate()
     {
@@ -184,10 +188,30 @@ public class Player : MonoBehaviour
         if (gold < go || wood < w || stone < s || grain < gr || iron < i) return false;
         else return true;
     }
-
     private void Buy(int go, int w, int s, int gr, int i) //gold, wood, stone, grain, iron
     {
         gold -= go; wood -= w; stone -= s; grain -= gr; iron -= i;
+    }
+
+    public void HasEnough_UI(string param) //gold, wood, stone, grain, iron, upkeep, reqTier, toBuyName, Buttonname
+    {
+        string[] s = param.Split(',');
+        bool isNotOk = gold < int.Parse(s[0]) || wood < int.Parse(s[1]) || stone < int.Parse(s[2]) || grain < int.Parse(s[3]) 
+            || iron < int.Parse(s[4]) || (pikemen + cavalry + archers + int.Parse(s[5])) * 10 > upkeep * 20 + tier * 50 || int.Parse(s[6]) > tier
+            || IsOwned(s[7]);
+
+        GameObject but = GameObject.Find(s[8]);
+        Button butt = but.GetComponent<Button>();
+        butt.interactable = !isNotOk;
+    }
+    public bool IsOwned(string bOrT)
+    {
+        if ((bOrT == "mill" && mill) || (bOrT == "forge" && forge) || (bOrT == "tavern" && tavern) || (bOrT == "tier2" && tier == 2) 
+            || (bOrT == "tier3" && tier == 3))
+        {
+            return true;
+        }
+        return false;
     }
     #endregion
 }
