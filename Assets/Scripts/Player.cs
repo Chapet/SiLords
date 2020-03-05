@@ -23,6 +23,8 @@ public class Player : MonoBehaviour
     public int pikemen = 1;
     public int cavalry = 0;
     public int archers = 0;
+    public int sellswords = 0;
+    public int siegeEngine = 0;
 
     //tier
     public int tier = 1;
@@ -135,8 +137,8 @@ public class Player : MonoBehaviour
     public void AcquirePikemen()
     {
         int upkp = upkeep*20 + tier*50;
-        int curUpkeep = (pikemen + cavalry + archers)*10;
-        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1)) //doesn't already own a tavern & has the recquired ressources
+        int curUpkeep = (pikemen + cavalry + archers + sellswords + siegeEngine)*10;
+        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1))
         {
             pikemen++;
             Buy(100, 0, 0, 0, 1);
@@ -146,8 +148,8 @@ public class Player : MonoBehaviour
     public void AcquireCavalry()
     {
         int upkp = upkeep * 20 + tier * 50;
-        int curUpkeep = (pikemen + cavalry + archers) * 10;
-        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1)) //doesn't already own a tavern & has the recquired ressources
+        int curUpkeep = (pikemen + cavalry + archers + sellswords + siegeEngine) * 10;
+        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1))
         {
             cavalry++;
             Buy(100, 0, 0, 0, 1);
@@ -157,19 +159,49 @@ public class Player : MonoBehaviour
     public void AcquireArchers()
     {
         int upkp = upkeep * 20 + tier * 50;
-        int curUpkeep = (pikemen + cavalry + archers) * 10;
-        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1)) //doesn't already own a tavern & has the recquired ressources
+        int curUpkeep = (pikemen + cavalry + archers + sellswords + siegeEngine) * 10;
+        if (upkp > curUpkeep && HasEnough(100, 0, 0, 0, 1))
         {
             archers++;
             Buy(100, 0, 0, 0, 1);
         }
         return;
     }
+    public void AcquireSellswords()
+    {
+        int upkp = upkeep * 20 + tier * 50;
+        int curUpkeep = (pikemen + cavalry + archers + sellswords + siegeEngine) * 10;
+        if (upkp > curUpkeep && HasEnough(250, 0, 0, 1, 0) && tier > 1)
+        {
+            sellswords++;
+            Buy(250, 0, 0, 1, 0);
+        }
+        return;
+    }
+    public void AcquireSiegeEngine()
+    {
+        int upkp = upkeep * 20 + tier * 50;
+        int curUpkeep = (pikemen + cavalry + archers + sellswords + siegeEngine) * 10;
+        if (upkp > curUpkeep && HasEnough(200, 1, 0, 0, 1) && tier > 2)
+        {
+            siegeEngine++;
+            Buy(200, 1, 0, 0, 1);
+        }
+        return;
+    }
     public void ChangeTier(int level)
     {
-        if (level == 2)
+        switch (level) 
         {
-            
+            case 1: //has been defeated and thus tier goes back to 1
+                tier = 1;
+                break;
+            case 2:
+                if (tier == 1) tier = 2;
+                break;
+            case 3:
+                if (tier == 2) tier = 3;
+                break;
         }
     }
     public void ChangeReadystate()
@@ -197,7 +229,7 @@ public class Player : MonoBehaviour
     {
         string[] s = param.Split(',');
         bool isNotOk = gold < int.Parse(s[0]) || wood < int.Parse(s[1]) || stone < int.Parse(s[2]) || grain < int.Parse(s[3]) 
-            || iron < int.Parse(s[4]) || (pikemen + cavalry + archers + int.Parse(s[5])) * 10 > upkeep * 20 + tier * 50 || int.Parse(s[6]) > tier
+            || iron < int.Parse(s[4]) || (pikemen + cavalry + archers + sellswords + siegeEngine + int.Parse(s[5])) * 10 > upkeep * 20 + tier * 50 || int.Parse(s[6]) > tier
             || IsOwned(s[7]);
 
         GameObject but = GameObject.Find(s[8]);
@@ -206,8 +238,8 @@ public class Player : MonoBehaviour
     }
     public bool IsOwned(string bOrT)
     {
-        if ((bOrT == "mill" && mill) || (bOrT == "forge" && forge) || (bOrT == "tavern" && tavern) || (bOrT == "tier2" && tier == 2) 
-            || (bOrT == "tier3" && tier == 3))
+        if ((bOrT == "mill" && mill) || (bOrT == "forge" && forge) || (bOrT == "tavern" && tavern) || (bOrT == "tier2" && tier >= 2) 
+            || (bOrT == "tier3" && tier >= 3))
         {
             return true;
         }
